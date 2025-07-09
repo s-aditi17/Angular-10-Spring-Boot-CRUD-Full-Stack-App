@@ -12,10 +12,10 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building Spring Boot JAR...
+      - cd springboot-backend
       - mvn clean package -DskipTests
-      - cd ..
       - echo Building Docker image...
-      - docker build -t $REPOSITORY_URI:latest springboot-backend/Dockerfile .
+      - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
