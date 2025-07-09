@@ -1,7 +1,7 @@
-FROM public.ecr.aws/amazoncorretto/amazoncorretto:17-alpine as build
+FROM maven:3.9.4-eclipse-temurin-17 as build
 WORKDIR /app
 COPY . .
-FROM public.ecr.aws/amazoncorretto/amazoncorretto:17-alpine
+FROM maven:3.9.4-eclipse-temurin-17
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
