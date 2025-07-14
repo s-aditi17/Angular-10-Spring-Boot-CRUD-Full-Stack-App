@@ -52,6 +52,19 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
+	<repositories>
+      <repository>
+        <id>nexus-release</id>
+        <url>http://35.173.1.85:8081/repository/maven-release/</url>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+      </repository>
+    </repositories>
+
 
 	<build>
 		<plugins>
