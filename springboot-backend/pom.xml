@@ -55,7 +55,7 @@
 	<repositories>
       <repository>
         <id>nexus-release</id>
-        <url>http://35.173.1.85:8081/repository/maven-release/</url>
+        <url>http://3.237.90.207:8081/repository/maven-release/</url>
         <releases>
           <enabled>true</enabled>
         </releases>
