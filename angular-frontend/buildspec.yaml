@@ -20,16 +20,22 @@ phases:
       - cd angular-frontend
 
   build:
-    commands:
-      - echo Build started on `date`
-      - echo Installing dependencies...
-      - npm install
-      - echo Building Angular app...
-      - npm run build
-      - echo Angular app built successfully.
-      - echo Building Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  commands:
+    - echo Build started on `date`
+    - echo Installing dependencies...
+    - npm install
+
+    - echo Setting legacy OpenSSL provider to fix Node crypto error...
+    - export NODE_OPTIONS=--openssl-legacy-provider
+
+    - echo Building Angular app...
+    - npm run build
+    - echo Angular app built successfully.
+
+    - echo Building Docker image...
+    - docker build -t $REPOSITORY_URI:latest .
+    - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+
 
   post_build:
     commands:
