@@ -7,16 +7,14 @@ env:
 phases:
   install:
     runtime-versions:
-      nodejs: 16
+      nodejs: 18
 
   pre_build:
     commands:
       - echo Logging in to Docker Hub...
       - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
-
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
-
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo IMAGE_TAG=$IMAGE_TAG
       - export IMAGE_TAG
@@ -28,14 +26,9 @@ phases:
       - echo Build started on `date`
       - echo Installing dependencies...
       - npm install
-
-      - echo Setting legacy OpenSSL provider to fix Node.js crypto error...
-      - export NODE_OPTIONS=--openssl-legacy-provider
-
       - echo Building Angular app...
       - npm run build
       - echo Angular app built successfully.
-
       - echo Building Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
@@ -45,7 +38,6 @@ phases:
       - echo Pushing Docker image to Amazon ECR...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-
       - echo Creating imagedefinitions.json for ECS...
       - printf '[{"name":"myfrontend-repo","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
