@@ -5,43 +5,41 @@ env:
     REPOSITORY_URI: 140481471220.dkr.ecr.us-east-1.amazonaws.com/myfrontend-repo
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 18
-    commands:
-      - echo Installing runtime...
-
   pre_build:
     commands:
       - echo Logging in to Docker Hub...
       - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
+
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
+
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - export IMAGE_TAG
       - echo IMAGE_TAG=$IMAGE_TAG
-      - echo Checking directory structure...
-      - ls -la
-      - cd angular-frontend || (echo "angular-frontend directory not found!" && exit 1)
+      - export IMAGE_TAG
+      - echo Changing directory to angular-frontend...
+      - cd angular-frontend
 
   build:
     commands:
-      - set -x
       - echo Build started on `date`
-      - npm install --legacy-peer-deps
-      - npm run build --verbose
-      - echo Angular build done
+      - echo Installing dependencies...
+      - npm install
+      - echo Building Angular app...
+      - npm run build
+      - echo Angular app built successfully.
+      - echo Building Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
-      - echo Pushing Docker images to ECR...
+      - echo Pushing Docker image to Amazon ECR...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing imagedefinitions.json...
+
+      - echo Creating imagedefinitions.json for ECS...
       - printf '[{"name":"myfrontend-repo","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
   files:
-    - angular-frontend/imagedefinitions.json
+    - imagedefinitions.json
