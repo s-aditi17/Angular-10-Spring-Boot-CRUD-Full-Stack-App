@@ -5,6 +5,10 @@ env:
     REPOSITORY_URI: 140481471220.dkr.ecr.us-east-1.amazonaws.com/myfrontend-repo
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: 16
+
   pre_build:
     commands:
       - echo Logging in to Docker Hub...
@@ -20,22 +24,21 @@ phases:
       - cd angular-frontend
 
   build:
-  commands:
-    - echo Build started on `date`
-    - echo Installing dependencies...
-    - npm install
+    commands:
+      - echo Build started on `date`
+      - echo Installing dependencies...
+      - npm install
 
-    - echo Setting legacy OpenSSL provider to fix Node crypto error...
-    - export NODE_OPTIONS=--openssl-legacy-provider
+      - echo Setting legacy OpenSSL provider to fix Node.js crypto error...
+      - export NODE_OPTIONS=--openssl-legacy-provider
 
-    - echo Building Angular app...
-    - npm run build
-    - echo Angular app built successfully.
+      - echo Building Angular app...
+      - npm run build
+      - echo Angular app built successfully.
 
-    - echo Building Docker image...
-    - docker build -t $REPOSITORY_URI:latest .
-    - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-
+      - echo Building Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
