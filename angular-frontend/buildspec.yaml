@@ -18,20 +18,17 @@ phases:
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo IMAGE_TAG=$IMAGE_TAG
       - export IMAGE_TAG
-      - echo Changing directory to angular-frontend...
-      - cd angular-frontend
 
   build:
     commands:
       - echo Build started on `date`
       - echo Installing dependencies...
-      - npm install
+      - cd angular-frontend && npm install
       - echo Building Angular app...
-      - npm run build
+      - cd angular-frontend && npm run build
       - echo Angular app built successfully.
       - echo Building Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t $REPOSITORY_URI:latest -t $REPOSITORY_URI:$IMAGE_TAG ./angular-frontend
 
   post_build:
     commands:
