@@ -14,7 +14,7 @@ phases:
       - echo IMAGE_TAG=$IMAGE_TAG
       - echo Changing directory to angular-frontend...
       - cd angular-frontend
-      - REPOSITORY_URI=140481471220.dkr.ecr.us-east-1.amazonaws.com/angular-frontend
+      - REPOSITORY_URI=140481471220.dkr.ecr.us-east-1.amazonaws.com/myfrontend-repo
 
   build:
     commands:
@@ -35,7 +35,7 @@ phases:
 
       - echo Creating imagedefinitions.json for ECS...
       - cd ..
-      - printf '[{"name":"angular-frontend","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"myfrontend-repo","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
   files:
