@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  variables:
+    REPOSITORY_URI: 140481471220.dkr.ecr.us-east-1.amazonaws.com/myfrontend-repo
+
 phases:
   pre_build:
     commands:
@@ -7,37 +11,34 @@ phases:
       - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
 
       - echo Logging in to Amazon ECR...
-      - aws --version
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 140481471220.dkr.ecr.us-east-1.amazonaws.com
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
 
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo IMAGE_TAG=$IMAGE_TAG
+      - export IMAGE_TAG
       - echo Changing directory to angular-frontend...
       - cd angular-frontend
-      - REPOSITORY_URI=140481471220.dkr.ecr.us-east-1.amazonaws.com/myfrontend-repo
 
-build:
-  commands:
-    - echo Build started on `date`
-    - echo Installing dependencies...
-    - npm install
-    - echo Dependencies installed.
-    - echo Building Angular app...
-    - npm run build  # <-- or: npx ng build --configuration production
-    - echo Angular app built successfully.
-    - echo Building Docker image...
-    - docker build -t $REPOSITORY_URI:latest .
-    - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Installing dependencies...
+      - npm install
+      - echo Building Angular app...
+      - npm run build
+      - echo Angular app built successfully.
+      - echo Building Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
-  commands:
-    - echo Pushing Docker image to Amazon ECR...
-    - docker push $REPOSITORY_URI:latest
-    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    commands:
+      - echo Pushing Docker image to Amazon ECR...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
 
-    - echo Creating imagedefinitions.json for ECS...
-    - printf '[{"name":"myfrontend-repo","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-
+      - echo Creating imagedefinitions.json for ECS...
+      - printf '[{"name":"myfrontend-repo","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
   files:
