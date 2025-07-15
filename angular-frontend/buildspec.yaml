@@ -16,16 +16,18 @@ phases:
       - cd angular-frontend
       - REPOSITORY_URI=140481471220.dkr.ecr.us-east-1.amazonaws.com/myfrontend-repo
 
-  build:
-    commands:
-      - echo Build started on `date`
-      - echo Installing dependencies...
-      - npm install
-      - echo Building Angular app...
-      - npm run build --prod
-      - echo Building Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+build:
+  commands:
+    - echo Build started on `date`
+    - echo Installing dependencies...
+    - npm install
+    - echo Dependencies installed.
+    - echo Building Angular app...
+    - npm run build  # <-- or: npx ng build --configuration production
+    - echo Angular app built successfully.
+    - echo Building Docker image...
+    - docker build -t $REPOSITORY_URI:latest .
+    - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
